@@ -20,6 +20,9 @@ const manager = new ProductManager('products.json');
     })
 
     console.log(await manager.getProducts());
+    await manager.removeProduct(7)
+    console.log(await manager.getProducts());
+
 })()
 
 

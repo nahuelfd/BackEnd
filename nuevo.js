@@ -13,44 +13,74 @@ class ProductManager {
     }
 
     getNextID = list => {
-    const count = list.length
-    return (count > 0) ? list[count-1].id +1 : 1
+        const count = list.length
+        return (count > 0) ? list[count-1].id +1 : 1
 
     }
 
     write = list => {
-    return fs.promises.writeFile(this.path, JSON.stringify(list))
+        return fs.promises.writeFile(this.path, JSON.stringify(list))
     }
 
     getProducts = async () => {
-    const data = await this.read()
-
-    return data
+        return await this.read()
     }
 
-    addProduct = async (obj) => {
-    const list = await this.read()
-    const nextID = this.getNextID(list)
-    obj.id = nextID
+    addProduct = async (prod) => {
+        if (!this.checkProductoValido(prod)) {
+            console.log("Producto no valido")
+            return false
+        }
     
-    list.push(obj)
-
-    await this.write(list)
+        const productList = await this.getProducts()
+        const nextID = this.getNextID(productList)
+        prod.id = nextID
+    
+        productList.push(prod)
+        
+        await this.write(productList)
+        return true
     }
 
    
-    updateProductIdx = async (id, obj) => {
-    obj.id = id
-    const list = await this.read()
+    updateProductId = async (id, prod) => {
+        if (!checkProductoValido(prod)) {
+            console.log("Producto no valido")
+            return false
+        }
 
-    const idx = list.findIndex(e => e.id == id)
-    if (idx < 0) return
+        const productList = await this.getProducts()
+        const index = productList.findIndex(element => element.id === id)
+        if (index < 0) return false
 
-    list[idx] = obj
+        prod.id = id
+        productList[index] = prod
 
-    await this.write(list)
+        await this.write(productList)
+        return true
     }
 
+    checkProductoValido = (product) => {
+        const { title, description, price, thumbnail, code, stock} = product
+
+        // Verificar que estan todos los campos y code > 0
+        if (!title || !description || !price || !thumbnail || !code || !stock) {
+            console.log("falta uno o mas parametros");
+            return false
+        }
+        return true;
+    }
+
+    removeProduct = async (id) => {
+        const productList = await this.getProducts()
+        const index = productList.findIndex(element => element.id === id)
+        if (index < 0) return false
+
+        productList.splice(index, 1)
+        await this.write(productList)
+        return true
+
+    }
 }
 
 module.exports = ProductManager
