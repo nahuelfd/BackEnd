@@ -1,5 +1,4 @@
 
-
 class ProductManager {
     
     constructor() {
@@ -33,19 +32,23 @@ class ProductManager {
         
     }
 
-    addProduct = (name, description, price, thumbnail, code, stock) => {
-        const id = this.getNextID()
+    addProduct = (product) => {
+        const { title, description, price, thumbnail, code, stock} = product
 
-        const product = {
-            id,
-            name, 
-            description, 
-            price,
-            thumbnail,
-            code,
-            stock,
+        // Verificar que estan todos los campos y code > 0
+        if (!title || !description || !price || !thumbnail || !code || !stock) {
+            console.log("falta uno o mas parametros");
+            return
         }
 
+        const products = this.getProducts()
+        if (products.find(tmpProd => tmpProd.code === code)) {
+           console.log('El code ya pertenece a un producto'); return 
+        }
+        
+        const id = this.getNextID()
+        product.id = id
+        
         this.products.push(product)
     }
 
@@ -61,7 +64,9 @@ getProductsById = () => {
 }
 
 const item = new ProductManager()
-item.addProduct("Remera Classic", "Remera escote redondo", 100, './images/remera', 0, 10)
+item.addProduct({title: "Remera Classic", description: "Remera escote redondo", price: 100, thumbnail: './images/remera', code: 5, stock: 10})
 item.addProduct("Jean Telmo", "hot jean negro", 150, null, 1, 7)
+item.addProduct({title: "Bermuda de jean", description: "short", price: 1220, thumbnail: './images/remera', code: 5, stock: 10})
+
 console.log(item.products);
 getProductsById()
